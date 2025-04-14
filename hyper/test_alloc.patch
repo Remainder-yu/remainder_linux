@@ -1,0 +1,75 @@
+[yujuncheng@Computer165 usos-hypervisor]$ git diff .
+diff --git a/hypervisor/commands/cmd_host.c b/hypervisor/commands/cmd_host.c
+index dcb5fc8a8..384629937 100644
+--- a/hypervisor/commands/cmd_host.c
++++ b/hypervisor/commands/cmd_host.c
+@@ -78,6 +78,8 @@ static void cmd_host_usage(struct vmm_chardev *cdev)
+        vmm_cprintf(cdev, "   host bus_device_list <bus_name>\n");
+        vmm_cprintf(cdev, "   host class_list\n");
+        vmm_cprintf(cdev, "   host class_device_list <class_name>\n");
++       vmm_cprintf(cdev, "   host ram test_alloc <size>\n");
++       vmm_cprintf(cdev, "   host ram test_free <physaddr> <size> \n");
+ }
+ 
+ static int cmd_host_info(struct vmm_chardev *cdev)
+@@ -399,6 +401,46 @@ static int cmd_host_ram_reserve(struct vmm_chardev *cdev, physical_addr_t paddr,
+        return vmm_host_ram_reserve(paddr, size);
+ }
+ 
+static int cmd_host_ram_test_alloc(struct vmm_chardev *cdev, int size) {
+
+       vmm_cprintf(cdev, "=== remainder test_alloc, size = %d \n", size);
+#if 1
+       physical_addr_t pa = 0x0;
+    u32 align_order = VMM_PAGE_SHIFT;
+    u32 page_shift = VMM_PAGE_SHIFT;
+    virtual_addr_t page_size = (1 << page_shift);
+       // size * page_size 为了匹配xvisor中的Bank00 Free Frames，其中Frame Size : 4096 (0x00001000)
+    physical_size_t alloc_size
+                                                       = vmm_host_ram_alloc(&pa, size * page_size, align_order);
+
+    vmm_cprintf(cdev, "=== remainder test memory alloc success ,start_pa: %0lx, alloc_size = %ld\n", pa, alloc_size);
+
+       if(alloc_size != size * page_size) {
+               return VMM_ENOSPC;
+       }
+#endif
+
+       // virtual_addr_t vir_addr = vmm_host_alloc_hugepages(size, VMM_MEMORY_FLAGS_NORMAL);
+       // virtual_addr_t vir_addr = vmm_host_alloc_aligned_pages(size, VMM_PAGE_SHIFT, VMM_MEMORY_FLAGS_NORMAL);
+       // vmm_cprintf(cdev, "=== remainder test memory alloc success ,start_va: %0lx \n", vir_addr);
+       return VMM_OK;
+}
+
+static int cmd_host_ram_test_free(struct vmm_chardev *cdev, physical_addr_t paddr, int size) {
+
+       u32 page_shift = VMM_PAGE_SHIFT;
+       virtual_addr_t page_size = (1 << page_shift);
+       // size * page_size 为了匹配xvisor中的Bank00 Free Frames，其中Frame Size : 4096 (0x00001000)
+       vmm_cprintf(cdev, "=== remainder test_free, paddr: %0lx, size = %ld \n", paddr, size * page_size);
+
+       int result =  vmm_host_ram_free(paddr, size * page_size);
+
+       if(result != VMM_OK ) {
+               return VMM_ENOSPC;
+       }
+       return VMM_OK;
+}
+
+ static void cmd_host_ram_bitmap(struct vmm_chardev *cdev, int colcnt)
+ {
+        u32 ite, count, bn, bank_count = vmm_host_ram_bank_count();
+@@ -772,6 814,13 @@ static int cmd_host_exec(struct vmm_chardev *cdev, int argc, char **argv)
+                        physaddr = strtoul(argv[3], NULL, 16);
+                        size = strtoul(argv[4], NULL, 16);
+                        return cmd_host_ram_reserve(cdev, physaddr, size);
+               } else if (strcmp(argv[2], "test_alloc") == 0) {
+                       size = strtoul(argv[3], NULL, 0);
+                       return cmd_host_ram_test_alloc(cdev, size);
+               } else if (strcmp(argv[2], "test_free") == 0 && 4 < argc) {
+                       physaddr = strtoul(argv[3], NULL, 16);
+                       size = strtoul(argv[4], NULL, 0);
+                       return cmd_host_ram_test_free(cdev, physaddr, size);
+                }
+        } else if ((strcmp(argv[1], "vapool") == 0) && (2 < argc)) {
+                if (strcmp(argv[2], "info") == 0) {

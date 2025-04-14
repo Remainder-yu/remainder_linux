@@ -1,0 +1,17 @@
+xen
+
+Q1: yocto编译的xen-image-minimal启动找不到Starting syslogd/klogd: done
+No xenstored found怎么处理
+
+header-icon
+如果在 Yocto 编译的 xen-image-minimal 中启动时出现 "Starting syslogd/klogd: done" 和 "No xenstored found" 错误，你可以尝试以下解决方法：
+
+
+确保正确配置 syslogd/klogd 服务：检查 Yocto 构建中的配置文件，通常位于 meta/recipes-core/sysvinit/sysvinit-inittab 或 meta/recipes-core/sysvinit/sysvinit_2.97.bb。确保启用了 syslog 和 klogd 服务的正确配置，并确保它们在启动时运行。
+
+检查 xenstored 守护进程是否存在：确认在构建 Yocto 时是否正确包含了 xenstored 守护进程。请检查相关的 Yocto 配置文件，如 meta-virtualization/recipes-extended/xen/xen_%.bbappend。确保 xenstored 守护进程被正确打包并包含在生成的镜像中。
+
+检查 xenstored 配置：检查 xenstored 的配置文件，如 /etc/xen/xend-config.sxp，确保其中的配置项正确设置。特别注意 xenstored_path 是否正确指向守护进程的路径。
+
+检查模块是否正确加载：确保 xenstore 相关的内核模块正确加载。可以使用命令 lsmod | grep xen 来检查是否加载了相关模块。如果没有加载，可以尝试手动加载模块，具体操作可能因 Yocto 版本和配置而异。
+如果上述方法无法解决问题，建议提供更多关于你的 Yocto 版本、配置文件以及操作系统环境的详细信息，以便更进一步地帮助你解决问题。
