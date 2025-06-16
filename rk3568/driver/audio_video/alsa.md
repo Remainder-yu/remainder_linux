@@ -1,3 +1,14 @@
+ALSA框架从上到下依次为应用程序、ALSA Library API、ALSA CORE、ASoC CORE、硬件驱动程序、硬件设备；
+
+1) 应用程序
+
+2）ALSA Library API
+alsa用户库接口，对应用程序提供统一的API接口，
+3）Alsa CORE
+alsa 核心层，向上提供逻辑设备（）系统调用。
+4）ASOC CORE
+
+
 # alsa声卡设备
 ## PCM
 PCM 脉冲编码调制
