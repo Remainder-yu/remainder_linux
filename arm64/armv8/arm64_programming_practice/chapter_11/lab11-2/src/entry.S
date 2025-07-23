@@ -88,10 +88,12 @@ el0_fiq_invalid:
 el0_error_invalid:
 	inv_entry 0, BAD_ERROR
 
+// 符号string_test用来定义一个字符串，这个字符串只有一个t字符
 string_test:
 	.string "t"
 
 .global trigger_alignment
+// .align  2 // 如果添加这句就不会触发同步异常，字节未对齐
 trigger_alignment:
 	ldr x0, =0x80002
 	ldr x1, [x0]
