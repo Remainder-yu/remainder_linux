@@ -48,3 +48,6 @@ gdb命令调试单独学习。
 ## gdb调试技巧
 
 gdb调试命令对应表格（待补充）
+
+## 参考
+[树莓派4-qemu下载](https://chenlongos.com/raspi4-with-arceos-doc/chapter_1.1.html)
