@@ -38,8 +38,8 @@ el2_entry:
 	ldr x0, =HCR_HOST_NVHE_FLAGS
 	msr hcr_el2, x0
 
-	ldr x0, =SCTLR_VALUE_MMU_DISABLED
-	msr sctlr_el1, x0
+	ldr x0, =SCTLR_VALUE_MMU_DISABLED // 设置系统的大小端，关闭MMU
+	msr sctlr_el1, x0 // 设置系统的大小端
 
 	ldr x0, =SPSR_EL1
 	msr spsr_el2, x0
@@ -50,7 +50,7 @@ el2_entry:
 	eret
 
 el1_entry:
-	bl print_el
+	bl print_el //REMAINDER： 输出当前异常等级，调试代码
 
 	adr	x0, _bss
 	adr	x1, _ebss
