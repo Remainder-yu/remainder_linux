@@ -11,10 +11,10 @@ index f0f2a7d..acc4f7f 100644
 @@ -1,10 +1,10 @@
 -ARMGNU ?= aarch64-linux-gnu
 +ARMGNU = /home/yujuncheng/learn_remainder/xvisor_learn/aarch64-linux-gnu/bin/aarch64-linux-gnu
- 
+
 -board ?= rpi4
 +board = rpi3
- 
+
  ifeq ($(board), rpi3)
  COPS += -DCONFIG_BOARD_PI3B
 -QEMU_FLAGS  += -machine raspi3
@@ -92,6 +92,8 @@ b _start
 c
 ```
 
+![alt text](./image/qemu环境gdb调试.png)
+
 ## qemu+gdb调试
 
 我们可以使用GDB+QEMU虚拟机单步调试裸机程序。
@@ -106,7 +108,7 @@ target remote localhost:1234
 b _start
 # 单步进行调试
 c
-# 单步 
+# 单步
 s / step
 # 不进入函数
 n
@@ -168,4 +170,3 @@ A64指令集可以分成如下几类：
 * [ ] 独占访存指令
 * [ ] 内存屏障指令
 * [ ] 异常处理指令
-
