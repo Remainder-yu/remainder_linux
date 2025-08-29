@@ -23,3 +23,8 @@ https://e.coding.net/weidongshan/linux/doc_and_source_for_drivers.git
 https://e.coding.net/weidongshan/01_all_series_quickstart.git
 
 https://gitee.com/staok/ARM-Linux-Study.git
+
+安全启动-> 启动流程-> systemd-> 优化流程
+网络协议栈+驱动 -> 驱动框架 + 异步
+armv8架构 -> 内存管理
+操作系统基础概念
