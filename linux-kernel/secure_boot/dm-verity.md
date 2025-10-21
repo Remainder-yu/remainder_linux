@@ -94,8 +94,6 @@ static int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 　　argv[8]--对应struct dm_verity->root_digest。
 　　argv[9]--对应struct dm_verity->salt。
 */
-
-
 ```
 
 
