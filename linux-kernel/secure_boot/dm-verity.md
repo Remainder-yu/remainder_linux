@@ -153,6 +153,7 @@ static int verity_map(struct dm_target *ti, struct bio *bio)
 ```
 
 
+
 ## 3. 参考文献：
 [device-mapper(1)：概述](https://www.cnblogs.com/arnoldlu/p/18845072)
 [device-mapper(2)：块设备数据完整性验证功能dm-verity](https://www.cnblogs.com/arnoldlu/p/18882608)
