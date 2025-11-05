@@ -164,6 +164,4 @@ Write file...(100%)
 Download image ok.
 Using /home/yujuncheng/data/rk_3568_510/tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/config.ini
 Reset Device OK.
-
-
 ```
