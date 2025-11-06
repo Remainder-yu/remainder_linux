@@ -22,3 +22,9 @@ kernel/arch/arm64/boot/dts/rockchip/rk3568.dtsi
 		};
 	};
 ```
+
+## keyirq-demo
+
+### API-中断相关
+
+request_irq
