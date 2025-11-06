@@ -1,6 +1,30 @@
 ## led 
 
+### Makefile编写
 
+```shell
+# export CROSS_COMPILE=/home/yujuncheng/data/rk_3568_510/prebuilts/gcc/linux-x86/aarch64/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+#
+export CROSS_PATH=/home/yujuncheng/data/rk_3568_510/prebuilts/gcc/linux-x86/aarch64/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin
+KERNELDIR := /home/yujuncheng/data/rk_3568_510/kernel
+# 目标架构为ARM64
+export ARCH := arm64
+export CROSS_COMPILE=$(CROSS_PATH)/aarch64-none-linux-gnu-
+#
+CURRENT_PATH := $(shell pwd)
+obj-m := led.o
+
+build: kernel_modules
+
+kernel_modules:
+	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) modules
+clean:
+	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) clean
+
+
+```
+
+### 模块测试
 ```shell
 # 加载模块
 root@ATK-DLRK3568:/userdata# insmod led.ko
