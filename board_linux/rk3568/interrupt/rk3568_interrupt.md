@@ -27,4 +27,4 @@ kernel/arch/arm64/boot/dts/rockchip/rk3568.dtsi
 
 ### API-中断相关
 
-request_irq
+request_irq 
