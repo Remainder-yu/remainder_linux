@@ -578,9 +578,9 @@ ret = register_netdev(ndev);  // 向内核注册网络设备
 ## 6. 发包流程stmmac_xmit
 stmmac_xmit 是 STMMAC 网卡驱动的数据发送入口函数，负责将 sk_buff（网络数据包）通过 DMA 传输到硬件队列。以下是核心流程：
 1. TSO（TCP Segmentation Offload）处理
-如果数据包支持 TSO（大帧分片卸载），调用 stmmac_tso_xmit 由硬件分片发送。
+如果数据包支持 TSO（大帧分片卸载），调用stmmac_tso_xmit由硬件分片发送。
 2. 队列空间检查
-检查 TX 队列剩余空间是否足够（stmmac_tx_avail），不足时暂停队列（netif_tx_stop_queue）。
+检查TX队列剩余空间是否足够（stmmac_tx_avail），不足时暂停队列（netif_tx_stop_queue）。
 3. 描述符配置
 根据数据包类型（普通帧、巨帧、分片帧）配置 DMA 描述符：
 普通帧：直接映射线性数据区（skb->data）。
@@ -623,6 +623,8 @@ static int stmmac_open(struct net_device *dev)
 
 
 ## 8. 参考文献
+
+[gmac传输流程](https://blog.csdn.net/m0_74825135/article/details/145978425)
 
 ## 9. Q&A
 问题1：网卡中断处理流程？请问是怎么处理中断的？网卡中断处理函数是怎样的？
