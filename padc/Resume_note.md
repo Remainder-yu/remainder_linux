@@ -89,7 +89,88 @@ LL/SC 实现（A64）
 
 ## POSIX适配层
 
+让普通 Linux 二进制（ELF）不用修改、不用重编译，就能直接在 Fuchsia 上跑起来，并且“看起来”自己仍然跑在 Linux 内核里。
 
+```shell
+┌─────────────────────────────────────────┐
+│  Linux 应用 (nginx, Redis, Android APK) │
+│  ELF .so 依赖 glibc/musl                │
+└────────────────┬────────────────────────┘
+                 │ 系统调用 int 0x80 / svc #0
+┌────────────────▼────────────────────────┐
+│           Starnix 层                    │
+│  ┌-------------------------------------┐ │
+│  │ 1. syscall 分派 (linux_syscall.cpp)│ │  ← 把 Linux 编号转成内部 op
+│  │ 2. 对象语义层                        │ │
+│  │    · task → zx_process + zx_thread  │ │
+│  │    · fd   → zx_handle (socket, vmo) │ │
+│  │    · epoll→ zx_port                   │ │
+│  │    · pipe → zx_socket(Stream)        │ │
+│  │    · signalfd → zx_port + exception  │ │
+│  │ 3. /proc, /sys, tmpfs, devpts        │ │  ← 虚拟文件系统
+│  │ 4. 信号、ptrace、seccomp、futex       │ │
+│  └-------------------------------------┘ │
+└────────────────┬────────────────────────┘
+                 │ zx 系统调用
+┌────────────────▼────────────────────────┐
+│           Zircon 微内核                 │
+│  process, thread, vm_object, channel,   │
+│  socket, port, interrupt, timer         │
+└─────────────────────────────────────────┘
+
+```
+
+从 Linux 用户态 svc #0 → 内核 el1_sync → Starnix syscall 分派 → 返回 eret。
+
+```shell
+Linux 64-bit app (EL0)
+┌──────────────────────────────┐
+│ mov     x8, #83              │  // sys_mmap
+│ svc     #0                   │  // 64-bit linux syscall
+└────┬─────────────────────────┘
+     V
+CPU 同步异常向量 ───────────────┐
+VBAR_EL1 + 0x400 (el0_sync)     │
+┌─► kernel/arch/arm64/el0_sync.S│
+│   kernel_exit 保存 pt_regs     │
+│   stp x0, x1, [sp, #16 * 0]    │
+│   mov x0, sp                   │  // pt_regs *
+│   bl  starnix_el0_handler      │
+└────┬───────────────────────────┘
+     V
+starnix/syscall/starnix_el0_handler()
+┌────────────────────────────────────┐
+│ regs->orig_x8 = x8                 │  // syscall nr
+│ regs->x0 ... x5 = 参数              │
+│ if (regs->x8 < 512)                │
+│     ret = linux_syscall_table[x8](regs); │
+│ else                               │
+│     ret = -ENOSYS;                 │
+│ regs->x0 = ret;                    │  // 返回值写回
+│ kernel_exit 0, eret                │
+└────┬───────────────────────────────┘
+     V
+eret // ELR_EL1 = regs->pc, SPSR_EL1 = 0x0 (EL0t)
+回到用户态 EL0
+```
+restricted模式：
+线程跑在EL1，但是看不见内核，只能看到该线程运行的资源。
+```cpp
+loader.restricted_elf_load()
+├─ zx_restricted_bind(handle, entry, restricted_vmo_list[])
+│  ├─ aspace_create_restricted()   // 新建“小页表”
+│  │   仅映射：ELF、栈、vdso、restricted_vmo_list
+│  ├─ thread_restricted_enter()
+│  │   t->restricted_flag = 1
+│  │   t->elr_el1 = entry
+│  │   t->spsr_el1 = 0x205 (EL1t, SP0)
+│  │   ttbr0_el1 = restricted_ttbr0  // 只有白名单物理页
+│  │   ttbr1_el1 = 0                  // 不映射内核
+└─ 首次调度 → eret 到 EL1 入口
+```
+结果：
+PC 运行在 EL1，但页表里 没有 kernel text、没有 kstack、没有外设；
+任何访问 0xffff... 内核地址 → stage-1 页表走空 → EL1 同步异常 → kill。
 
 
 
