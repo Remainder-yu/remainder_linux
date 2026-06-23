@@ -1,13 +1,12 @@
 ARMGNU ?= aarch64-linux-gnu
-
-board ?= rpi4
+board ?= rpi4b
 
 ifeq ($(board), rpi3)
 COPS += -DCONFIG_BOARD_PI3B
 QEMU_FLAGS  += -machine raspi3
-else ifeq ($(board), rpi4)
+else ifeq ($(board), rpi4b)
 COPS += -DCONFIG_BOARD_PI4B
-QEMU_FLAGS  += -machine raspi4
+QEMU_FLAGS  += -machine raspi4b
 endif
 
 COPS += -g -Wall -nostdlib -Iinclude -mgeneral-regs-only
