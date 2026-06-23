@@ -7,7 +7,7 @@ COPS += -DCONFIG_BOARD_PI3B
 QEMU_FLAGS  += -machine raspi3
 else ifeq ($(board), rpi4)
 COPS += -DCONFIG_BOARD_PI4B
-QEMU_FLAGS  += -machine raspi4
+QEMU_FLAGS  += -machine raspi4b
 endif
 
 COPS += -g -Wall -nostdlib -Iinclude -mgeneral-regs-only
